@@ -223,6 +223,14 @@ body.pdm .reset{color:#e8efe6}
 .pd-congrats{background:#2a5a1e;color:#fff;border-radius:22px;padding:20px 18px;display:flex;flex-direction:column;gap:14px;font-size:19px;line-height:1.4;animation:pop .5s ease}
 .pd-congrats p{margin:0}
 .pd-main .final{color:#fff}
+.pd-main .card{background:#faf8f5;color:#25211d;border-color:#d4cec6}
+.pd-main .card li{background:#efece8;color:#25211d}
+.pd-main .card dt{color:#6f6760}
+.pd-main .card dd,.pd-main .card p,.pd-main .card h3{color:#25211d}
+.pd-main .card .btn{background:transparent;border-color:#25211d;color:#25211d}
+.pd-main .card .btn.primary{background:#25211d;color:#faf8f5}
+.pd-main .card.picked{box-shadow:0 0 0 3px #f8d74a;border-color:#f8d74a}
+.pd-main .card .tag{color:#25211d}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
@@ -490,16 +498,15 @@ const counts = {};
 [ART.title, ...ART.body.map(b=>b[1])].forEach(t=>(t.match(WORD_RE)||[]).forEach(w=>{ const s=stem(w); counts[s]=(counts[s]||0)+1; }));
 let lastHit = null;
 
-function tokenHTML(text){
+function tokenHTML(text, isTitle){
   let out = "", i = 0;
   text.replace(WORD_RE, (w, idx)=>{
     out += esc(text.slice(i, idx)); i = idx + w.length;
     const st = stem(w);
-    const visible = S.guesses.includes(st);
+    const visible = S.guesses.includes(st) || (isTitle && S.won);
     const width = `${(w.length*0.62+0.6).toFixed(2)}em`;
     if(visible){
-      if(S.won && titleStems.includes(st)) out += `<span class="win">${esc(w)}</span>`;
-      else out += esc(w);
+      out += esc(w);
     } else if(S.near[st]){
       out += `<span class="r near" data-n="${w.length}" style="width:${width}">${esc(S.near[st])}</span>`;
     } else {
@@ -511,7 +518,7 @@ function tokenHTML(text){
 }
 
 function renderPed(){
-  let h = `<h3>${tokenHTML(ART.title)}</h3>`;
+  let h = `<h3>${tokenHTML(ART.title, true)}</h3>`;
   ART.body.forEach(([k,t])=>{
     if(k==="h") h += `<h4>${tokenHTML(t)}</h4>`;
     else if(k==="s") h += `<p class="see">${tokenHTML(t)}</p>`;
