@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Grand Indice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow column; stage 1 is a Connections board on clay tones, stage 2 mimics a Wikipedia page with Pédantle redaction. Palette: slip clay + four kiln glazes. */
+:root{
+  --bg:#efece8; --surface:#faf8f5; --tile:#e2ddd6; --tile-on:#3b3631; --fg:#25211d; --muted:#6f6760;
+  --line:#d4cec6; --accent:#2f4fa8;
+  --g1:#c9dcc4; --g2:#ecd08f; --g3:#a9bde9; --g4:#d9a3a0; --gtext:#25211d;
+  /* wiki page */
+  --wbg:#ffffff; --wfg:#202122; --wline:#a2a9b1; --wsoft:#eaecf0; --wlink:#3366cc; --wmuted:#54595d;
+  --redact:#202122; --near-bg:#c8ccd1; --near-fg:#54595d; --hit:#fff3b0;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --wserif:"Linux Libertine","Georgia","Times",serif;
+  --wsans:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1b1917; --surface:#24211f; --tile:#34302c; --tile-on:#e9e3db; --fg:#ece7e0; --muted:#a39a90;
+  --line:#3d3834; --accent:#8fa8ec;
+  --g1:#7f9a78; --g2:#c2a35a; --g3:#7389c2; --g4:#b07672; --gtext:#141210;
+  --wbg:#101418; --wfg:#eaecf0; --wline:#54595d; --wsoft:#27292d; --wlink:#88a3e8; --wmuted:#a2a9b1;
+  --redact:#c8ccd1; --near-bg:#54595d; --near-fg:#eaecf0; --hit:#5c4d12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1b1917; --surface:#24211f; --tile:#34302c; --tile-on:#e9e3db; --fg:#ece7e0; --muted:#a39a90;
+  --line:#3d3834; --accent:#8fa8ec;
+  --g1:#7f9a78; --g2:#c2a35a; --g3:#7389c2; --g4:#b07672; --gtext:#141210;
+  --wbg:#101418; --wfg:#eaecf0; --wline:#54595d; --wsoft:#27292d; --wlink:#88a3e8; --wmuted:#a2a9b1;
+  --redact:#c8ccd1; --near-bg:#54595d; --near-fg:#eaecf0; --hit:#5c4d12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,9vw,52px);line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.intro{color:var(--muted);margin:0;max-width:60ch}
+.steps{display:flex;gap:8px}
+.step{flex:1;font:inherit;font-family:var(--display);font-weight:700;font-size:15px;padding:10px 12px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.step[aria-current="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.step:disabled{cursor:not-allowed;opacity:.55}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section{display:flex;flex-direction:column;gap:14px}
+h2{font-family:var(--display);font-weight:700;font-size:24px;margin:0}
+.hint{margin:0;color:var(--muted);font-size:15px}
+/* Connections */
+#s1{max-width:560px;width:100%;margin:0 auto}
+.board{display:flex;flex-direction:column;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{font:inherit;font-family:var(--display);font-weight:700;font-size:clamp(12px,3.4vw,16px);text-transform:uppercase;letter-spacing:.02em;
+  aspect-ratio:1.35;max-width:100%;border:0;border-radius:8px;background:var(--tile);color:var(--fg);cursor:pointer;padding:4px;min-width:0;overflow-wrap:anywhere;transition:transform .12s ease,background .12s ease}
+.tile[aria-pressed="true"]{background:var(--tile-on);color:var(--bg)}
+.tile:active{transform:scale(.96)}
+.solved{border-radius:8px;padding:12px 10px;text-align:center;color:var(--gtext);animation:pop .35s ease}
+.solved b{display:block;font-family:var(--display);font-size:15px;text-transform:uppercase;letter-spacing:.04em}
+.solved span{font-size:14px;text-transform:uppercase;letter-spacing:.03em}
+.shake{animation:shake .35s ease}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:scale(1);opacity:1}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.mistakes{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:14px;justify-content:center}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--fg)}
+.dot.used{background:var(--line)}
+.btn{font:inherit;font-weight:700;font-size:15px;padding:10px 18px;border-radius:999px;border:1.5px solid var(--fg);background:transparent;color:var(--fg);cursor:pointer}
+.btn.primary{background:var(--fg);color:var(--bg)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.toast{min-height:24px;text-align:center;font-weight:700;font-size:15px}
+/* Pédantle (Wikipedia look) */
+.ped{background:var(--wbg);color:var(--wfg);font-family:var(--wsans);border:1px solid var(--wline);border-radius:4px;overflow:hidden}
+.pbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:1px solid var(--wline);background:var(--wsoft);flex-wrap:wrap}
+.plogo{font-family:var(--wserif);font-size:22px;letter-spacing:.02em}
+.plogo small{font-family:var(--wsans);font-size:12px;color:var(--wmuted);margin-left:6px}
+.pinfo{font-size:13px;color:var(--wmuted)}
+.pform{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid var(--wsoft)}
+.pform input{flex:1;min-width:0;font:inherit;font-size:16px;padding:7px 10px;border:1px solid var(--wline);border-radius:2px;background:var(--wbg);color:var(--wfg)}
+.pform button{font:inherit;font-size:15px;font-weight:700;padding:7px 14px;border:1px solid var(--wline);border-radius:2px;background:var(--wsoft);color:var(--wfg);cursor:pointer}
+.plast{padding:0 16px;min-height:22px;font-size:14px;color:var(--wmuted)}
+.pbody{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:0}
+@media (max-width:640px){.pbody{grid-template-columns:minmax(0,1fr)}.guesses{border-left:0;border-top:1px solid var(--wsoft);order:-1;max-height:170px}}
+.article{padding:14px 18px 24px;font-size:15.5px;line-height:1.75;overflow-wrap:anywhere;min-width:0}
+.article h3{font-family:var(--wserif);font-weight:400;font-size:30px;line-height:1.35;margin:0 0 4px;padding-bottom:4px;border-bottom:1px solid var(--wline)}
+.article .from{font-size:13px;color:var(--wmuted);margin:0 0 12px}
+.article h4{font-family:var(--wserif);font-weight:400;font-size:22px;margin:18px 0 6px;padding-bottom:2px;border-bottom:1px solid var(--wline)}
+.article p{margin:0 0 8px}
+.article .see{color:var(--wlink)}
+.r{display:inline-block;height:1.15em;vertical-align:-.2em;background:var(--redact);position:relative;cursor:pointer;margin:0 1px}
+.r.show::after{content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--wbg);line-height:1}
+.r.near{background:var(--near-bg);color:var(--near-fg);font-style:italic;text-align:center;overflow:hidden;white-space:nowrap;font-size:.92em;line-height:1.25em}
+.hit{background:var(--hit)}
+.guesses{border-left:1px solid var(--wsoft);font-size:13.5px;overflow:auto;max-height:620px}
+.guesses table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.guesses th{position:sticky;top:0;background:var(--wsoft);text-align:left;font-weight:700;padding:6px 8px;font-size:12px}
+.guesses td{padding:4px 8px;border-top:1px solid var(--wsoft)}
+.guesses td.n{color:var(--wmuted);width:2.5em}
+.guesses td.c{text-align:right;width:3em}
+.guesses tr.zero td:nth-child(2){color:var(--wmuted)}
+.guesses tr.last td{background:var(--hit)}
+/* Win */
+.congrats{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;padding:8px 0}
+.congrats .big{font-family:var(--display);font-weight:800;font-size:clamp(48px,15vw,84px);line-height:.9;letter-spacing:-.03em;margin:0;
+  background:linear-gradient(100deg,var(--g3),var(--g4),var(--g2),var(--g1));-webkit-background-clip:text;background-clip:text;color:transparent;animation:pop .6s ease}
+.congrats p{margin:0;color:var(--muted)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card .photo{margin:-18px -18px 2px;aspect-ratio:4/3;max-width:calc(100% + 36px);border-radius:12px 12px 0 0;overflow:hidden;display:grid;place-items:center;color:var(--gtext);font-family:var(--display);font-weight:700;font-size:15px;text-align:center;padding:12px}
+.card .photo img{width:100%;height:100%;object-fit:cover;display:block}
+.card .photo.has{padding:0}
+.group-label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 0 -4px}
+.card{display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:14px;background:var(--surface);border:1.5px solid var(--line);min-width:0}
+.card .tag{align-self:flex-start;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;color:var(--gtext)}
+.card h3{font-family:var(--display);font-size:24px;line-height:1.1;margin:0;text-wrap:balance}
+.card p{margin:0;font-size:15px}
+.card dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0;font-size:14px}
+.card dt{color:var(--muted)}
+.card dd{margin:0}
+.card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.card li{font-size:14.5px;padding:8px 10px;border-radius:8px;background:var(--bg)}
+.card li b{display:block;font-family:var(--display);font-size:15px}
+.card a{color:var(--accent);font-size:14px;font-weight:700}
+.card .btn{margin-top:auto}
+.card.picked{border-color:var(--fg);box-shadow:0 0 0 2px var(--fg)}
+.card.other{opacity:.5}
+.final{text-align:center;font-family:var(--display);font-weight:700;font-size:20px;margin:0}
+.reset{align-self:center;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Ton cadeau, en deux énigmes</span>
+    <h1>Le Grand Indice</h1>
+    <p class="intro">Résous les Connexions pour débloquer le Pédantle. Trouve la page cachée pour découvrir ton cadeau.</p>
+  </header>
+
+  <nav class="steps" aria-label="Étapes">
+    <button class="step" id="tab1" aria-current="true">1 · Connexions</button>
+    <button class="step" id="tab2" disabled>2 · Pédantle 🔒</button>
+  </nav>
+
+  <section id="s1">
+    <h2>Connexions</h2>
+    <p class="hint">Trouve quatre groupes de quatre mots. Attention, certains mots ont l'air d'aller ailleurs.</p>
+    <div class="board" id="board"></div>
+    <div class="toast" id="toast1" role="status"></div>
+    <div class="mistakes" id="mistakes"></div>
+    <div class="row">
+      <button class="btn" id="shuffle">Mélanger</button>
+      <button class="btn" id="deselect">Tout désélectionner</button>
+      <button class="btn primary" id="submit" disabled>Valider</button>
+    </div>
+  </section>
+
+  <section id="s2" hidden>
+    <div class="ped">
+      <div class="pbar">
+        <span class="plogo">Pédantle<small>édition spéciale</small></span>
+        <span class="pinfo" id="pinfo">Trouve le titre de la page</span>
+      </div>
+      <form class="pform" id="gform">
+        <input id="ginput" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Un mot…" aria-label="Proposer un mot">
+        <button type="submit">Proposer</button>
+      </form>
+      <div class="plast" id="plast" role="status"></div>
+      <div class="pbody">
+        <div class="article" id="article"></div>
+        <div class="guesses"><table><thead><tr><th>#</th><th>Mot</th><th style="text-align:right">Occ.</th></tr></thead><tbody id="gtable"></tbody></table></div>
+      </div>
+    </div>
+    <div id="winBox"></div>
+  </section>
+
+  <button class="reset" id="reset">Tout recommencer</button>
+</div>
+
+<script>
+/* ===================== À MODIFIER ICI =====================
+   Remplace les textes entre guillemets. Laisse lien: "" si tu n'en as pas. */
+const CHOICES = [
+  {
+    id: "tour",
+    tag: "Céramique",
+    couleur: "--g3",
+    photo: "",
+    titre: "Initiation au tour de potier",
+    description: "Tu apprends à centrer la terre sur le tour et à monter tes premières pièces : un bol, une tasse, ce qui sort de tes mains.",
+    options: [],
+    quand: "Tu choisis la date",
+    lien: ""
+  },
+  {
+    id: "boucles",
+    tag: "Bijouterie",
+    couleur: "--g2",
+    photo: "",
+    titre: "Boucles d'oreilles",
+    description: "Tu fabriques ta propre paire chez un artisan, et tu repars avec. Trois façons de faire :",
+    options: [
+      ["En laiton", "Tu scies une plaque, tu choisis la forme et la finition : lisse, texturée, brillante ou mate."],
+      ["Gravées et dorées", "Tu découpes le métal, tu le recuis au chalumeau et tu le graves au poinçon, finition à l'or fin."],
+      ["En argent", "Tu modèles une pâte d'argent comme de l'argile, elle passe au four et devient de l'argent massif."]
+    ],
+    quand: "Tu choisis la date",
+    lien: ""
+  }
+];
+const MESSAGE_FINAL = "Tu choisis la date, et je réserve !";
+/* ========================================================== */
+
+const GROUPS = [
+  {name:"Petites bêtes", words:["PUCE","MOUCHE","GUÊPE","FOURMI"], color:"--g1"},
+  {name:"Boucles d'oreilles", words:["CRÉOLE","PENDANT","DORMEUSE","CLOU"], color:"--g2"},
+  {name:"Vocabulaire du céramiste", words:["ARGILE","ÉMAIL","ENGOBE","BISCUIT"], color:"--g3"},
+  {name:"Tour de ___", words:["MAIN","COU","FRANCE","MAGIE"], color:"--g4"}
+];
+
+const ART = {
+  title: "Atelier d'artisanat",
+  body: [
+    ["p","Un atelier d'artisanat est un lieu où un artisan transmet son savoir-faire le temps d'un cours. On y travaille la matière avec les mains et des outils : la terre, le métal ou le verre. Chaque participant repart avec un objet qu'il a fabriqué lui-même."],
+    ["h","Céramique"],
+    ["p","La céramique consiste à façonner l'argile, par modelage ou sur un tour de potier, puis à cuire les pièces dans un four. Après une première cuisson, on obtient un biscuit, que l'on recouvre d'émail avant une seconde cuisson. Il faut souvent attendre plusieurs semaines avant de récupérer ses pièces."],
+    ["h","Bijouterie"],
+    ["p","La bijouterie travaille le métal, souvent le laiton ou l'argent. On scie une plaque avec une petite scie, on lime, on martèle pour donner une texture, puis on soude au chalumeau. Une paire de boucles d'oreilles peut être terminée en une seule séance."],
+    ["h","Choisir son atelier"],
+    ["p","Les deux pratiques demandent de la patience et des ongles courts. La céramique convient à ceux qui aiment la terre et la lenteur, la bijouterie à ceux qui aiment la précision et le métal. Certains artisans réunissent les deux et fabriquent des boucles d'oreilles en céramique."],
+    ["h","Voir aussi"],
+    ["s","Céramique · Bijouterie · Cadeau"]
+  ]
+};
+
+/* Mots proches (comme les mots gris du vrai Pédantle) : mot proposé → mots de l'article */
+const NEAR = {
+  cour:["atelier"], stage:["atelier"], workshop:["atelier"], studio:["atelier"], classe:["atelier","cours"], lecon:["cours","atelier"], seance:["cours","atelier"],
+  artisanal:["artisanat","artisan"], metier:["artisanat","savoir"], craft:["artisanat"], fabrication:["fabrique","artisanat"], creation:["artisanat","fabrique"], artiste:["artisan"],
+  poterie:["ceramique","potier"], potiere:["potier"], ceramiste:["ceramique"], porcelaine:["ceramique","argile"], gres:["argile","ceramique"], glaise:["argile","terre"], boue:["terre","argile"],
+  bijou:["bijouterie"], bijoutier:["bijouterie","artisan"], bijoutiere:["bijouterie","artisan"], joaillerie:["bijouterie"], boucle:["boucles"], oreille:["oreilles"],
+  cuivre:["laiton","metal"], or:["argent","metal"], fer:["metal"], soudure:["soude","chalumeau"], marteau:["martele"], scier:["scie"], cuire:["cuisson"], four:["four"],
+  vernis:["email"], glacure:["email"], tourner:["tour"], tournage:["tour","modelage"], main:["mains"], cadeaux:["cadeau"], anniversaire:["cadeau"]
+};
+
+const FREE = new Set("le la les l un une des de du d et ou en à a au aux est sont on y se s ce qui que qu où pour par sur dans avec puis il elle ils elles son sa ses leur leurs ne pas plus très donc lui même".split(/\s+/).map(w=>w.normalize("NFD").replace(/[̀-ͯ]/g,"")));
+
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/œ/g,"oe").replace(/æ/g,"ae");
+const stem = s => { s = norm(s); return s.length > 3 ? s.replace(/[sx]$/,"") : s; };
+
+/* ---------- State ---------- */
+const KEY = "grand-indice-v2";
+let S;
+function fresh(){ return {stage:1, solved:[], mistakes:0, order:shuffle(GROUPS.flatMap(g=>g.words)), guesses:[], near:{}, won:false, conLost:false, choice:null}; }
+function load(){ try{ const r = localStorage.getItem(KEY); if(r){ const o = JSON.parse(r); if(o && o.order){ o.near = o.near||{}; return o; } } }catch(e){} return fresh(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+S = load();
+let selected = new Set();
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- Tabs ---------- */
+function showStage(n){
+  $("s1").hidden = n!==1; $("s2").hidden = n!==2;
+  $("tab1").setAttribute("aria-current", n===1); $("tab2").setAttribute("aria-current", n===2);
+}
+function unlock(){ $("tab2").disabled = false; $("tab2").textContent = "2 · Pédantle"; }
+$("tab1").onclick = ()=>showStage(1);
+$("tab2").onclick = ()=>{ if(!$("tab2").disabled){ showStage(2); if(!S.won) $("ginput").focus(); } };
+
+/* ---------- Connections ---------- */
+function renderBoard(){
+  const b = $("board"); b.innerHTML = "";
+  S.solved.forEach(gi=>{
+    const g = GROUPS[gi], d = document.createElement("div");
+    d.className = "solved"; d.style.background = `var(${g.color})`;
+    d.innerHTML = `<b>${g.name}</b><span>${g.words.join(", ")}</span>`;
+    b.appendChild(d);
+  });
+  const left = S.order.filter(w=>!S.solved.some(gi=>GROUPS[gi].words.includes(w)));
+  if(left.length){
+    const grid = document.createElement("div"); grid.className = "grid";
+    left.forEach(w=>{
+      const t = document.createElement("button");
+      t.className = "tile"; t.textContent = w; t.setAttribute("aria-pressed", selected.has(w));
+      t.onclick = ()=>{
+        if(S.conLost) return;
+        if(selected.has(w)) selected.delete(w); else if(selected.size<4) selected.add(w);
+        renderBoard();
+      };
+      grid.appendChild(t);
+    });
+    b.appendChild(grid);
+  }
+  const m = $("mistakes"); m.innerHTML = "Erreurs restantes :";
+  for(let i=0;i<4;i++){ const d=document.createElement("span"); d.className="dot"+(i<S.mistakes?" used":""); m.appendChild(d); }
+  $("submit").disabled = selected.size!==4 || S.conLost;
+  const done = S.solved.length===4 || S.conLost;
+  ["shuffle","deselect","submit"].forEach(id=>$(id).hidden = done);
+  m.hidden = done;
+  if(done && !$("goPed")){
+    const go = document.createElement("button"); go.id="goPed"; go.className="btn primary"; go.textContent="Passer au Pédantle →";
+    go.onclick = ()=>{ showStage(2); $("ginput").focus(); };
+    $("shuffle").parentNode.appendChild(go);
+  }
+  if(!done && $("goPed")) $("goPed").remove();
+}
+function toast(msg){ $("toast1").textContent = msg; }
+$("shuffle").onclick = ()=>{ S.order = shuffle(S.order); save(); renderBoard(); };
+$("deselect").onclick = ()=>{ selected.clear(); renderBoard(); };
+$("submit").onclick = ()=>{
+  const pick = [...selected];
+  const gi = GROUPS.findIndex(g=>pick.every(w=>g.words.includes(w)));
+  if(gi>=0){
+    S.solved.push(gi); selected.clear(); toast("");
+    if(S.solved.length===4){ toast("Bravo ! Le Pédantle est débloqué."); finishCon(); }
+    save(); renderBoard();
+  } else {
+    const near = GROUPS.some(g=>pick.filter(w=>g.words.includes(w)).length===3);
+    S.mistakes++;
+    toast(near ? "À un mot près…" : "Raté.");
+    document.querySelectorAll('.tile[aria-pressed="true"]').forEach(t=>{ t.classList.remove("shake"); void t.offsetWidth; t.classList.add("shake"); });
+    if(S.mistakes>=4){
+      S.conLost = true;
+      GROUPS.forEach((g,i)=>{ if(!S.solved.includes(i)) S.solved.push(i); });
+      selected.clear();
+      toast("Plus d'essais. Voici les groupes. Le Pédantle est quand même ouvert !");
+      finishCon();
+    }
+    save(); setTimeout(renderBoard, 360);
+  }
+};
+function finishCon(){ if(S.stage<2) S.stage = 2; unlock(); save(); }
+
+/* ---------- Pédantle ---------- */
+const WORD_RE = /[A-Za-zÀ-ÖØ-öø-ÿŒœÆæ]+/g;
+const titleStems = [...new Set((ART.title.match(WORD_RE)||[]).map(stem).filter(s=>!FREE.has(s)))];
+const counts = {};
+[ART.title, ...ART.body.map(b=>b[1])].forEach(t=>(t.match(WORD_RE)||[]).forEach(w=>{ const s=stem(w); counts[s]=(counts[s]||0)+1; }));
+let lastHit = null;
+
+function tokenHTML(text){
+  let out = "", i = 0;
+  text.replace(WORD_RE, (w, idx)=>{
+    out += esc(text.slice(i, idx)); i = idx + w.length;
+    const st = stem(w);
+    const visible = S.won || FREE.has(norm(w)) || S.guesses.includes(st);
+    const width = `${(w.length*0.55+0.25).toFixed(2)}em`;
+    if(visible){
+      out += st===lastHit && !S.won ? `<span class="hit">${esc(w)}</span>` : esc(w);
+    } else if(S.near[st]){
+      out += `<span class="r near" data-n="${w.length}" style="width:${width}" title="${w.length} lettres">${esc(S.near[st])}</span>`;
+    } else {
+      out += `<span class="r" data-n="${w.length}" style="width:${width}" title="${w.length} lettres"></span>`;
+    }
+    return w;
+  });
+  return out + esc(text.slice(i));
+}
+
+function renderPed(){
+  let h = `<h3>${tokenHTML(ART.title)}</h3><p class="from">Un article de Wikipédia, l'encyclopédie libre.</p>`;
+  ART.body.forEach(([k,t])=>{
+    if(k==="h") h += `<h4>${tokenHTML(t)}</h4>`;
+    else if(k==="s") h += `<p class="see">${tokenHTML(t)}</p>`;
+    else h += `<p>${tokenHTML(t)}</p>`;
+  });
+  $("article").innerHTML = h;
+  $("article").querySelectorAll(".r:not(.near)").forEach(el=>el.onclick = ()=>el.classList.toggle("show"));
+  const tb = $("gtable"); tb.innerHTML = "";
+  S.guesses.map((g,i)=>({g,i})).reverse().forEach(({g,i})=>{
+    const c = counts[g]||0, tr = document.createElement("tr");
+    tr.className = (c?"":"zero") + (i===S.guesses.length-1 && !S.won ? " last":"");
+    tr.innerHTML = `<td class="n">${i+1}</td><td>${esc(g)}</td><td class="c">${c}</td>`;
+    tb.appendChild(tr);
+  });
+  const n = S.guesses.length;
+  $("pinfo").textContent = S.won ? `Trouvé en ${n} coup${n>1?"s":""}` : `${n} coup${n>1?"s":""}`;
+  $("gform").hidden = S.won;
+  renderWin();
+}
+
+$("gform").addEventListener("submit", e=>{
+  e.preventDefault();
+  const raw = $("ginput").value.trim(); $("ginput").value = "";
+  const w = (raw.match(WORD_RE)||[])[0]; if(!w) return;
+  const st = stem(w);
+  if(FREE.has(norm(w))){ $("plast").textContent = `« ${w} » est déjà affiché.`; return; }
+  if(S.guesses.includes(st)){ $("plast").textContent = `Déjà proposé : « ${w} ».`; return; }
+  S.guesses.push(st);
+  lastHit = counts[st] ? st : null;
+  let nearN = 0;
+  (NEAR[st]||[]).forEach(t=>{ const ts = stem(t); if(counts[ts] && !S.guesses.includes(ts)){ S.near[ts] = w.toLowerCase(); nearN++; } });
+  $("plast").textContent = lastHit ? `« ${w} » : ${counts[st]} occurrence${counts[st]>1?"s":""}.`
+    : nearN ? `« ${w} » n'y est pas, mais c'est proche de quelque chose…` : `« ${w} » n'est pas dans la page.`;
+  if(titleStems.every(t=>S.guesses.includes(t))){ S.won = true; lastHit = null; save(); renderPed(); celebrate(); $("winBox").scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  save(); renderPed();
+});
+
+/* ---------- Win: congrats + choose ---------- */
+function renderWin(){
+  const box = $("winBox");
+  if(!S.won){ box.innerHTML = ""; return; }
+  const n = S.guesses.length;
+  const cards = CHOICES.map((c,i)=>{
+    const cls = S.choice ? (S.choice===c.id ? " picked" : " other") : "";
+    const opts = (c.options||[]).length ? `<ul>${c.options.map(o=>`<li><b>${esc(o[0])}</b>${esc(o[1])}</li>`).join("")}</ul>` : "";
+    const rows = [["Artisan",c.artisan],["Lieu",c.lieu],["Durée",c.duree],["Quand",c.quand]].filter(r=>r[1]).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("");
+    const link = c.lien ? `<a href="${esc(c.lien)}" target="_blank" rel="noopener">Voir l'atelier ↗</a>` : "";
+    const btn = S.choice===c.id ? `<button class="btn" data-pick="">Changer d'avis</button>` : `<button class="btn primary" data-pick="${esc(c.id)}">Je choisis celui-ci</button>`;
+    const ph = c.photo ? `<div class="photo has"><img src="${esc(c.photo)}" alt="${esc(c.titre)}"></div>` : `<div class="photo" style="background:var(${c.couleur})">${esc(c.titre)}</div>`;
+    return `<article class="card${cls}">${ph}
+      <span class="tag" style="background:var(${c.couleur})">${esc(c.tag)}</span>
+      <h3>${esc(c.titre)}</h3>
+      <p>${esc(c.description)}</p>
+      ${opts}<dl>${rows}</dl>${link}${btn}
+    </article>`;
+  }).join("");
+  const picked = CHOICES.find(c=>c.id===S.choice);
+  box.innerHTML = `
+    <div class="congrats">
+      <p class="big">BRAVO !</p>
+      <p>Tu as trouvé « ${esc(ART.title)} » en ${n} coup${n>1?"s":""}.</p>
+      <p><strong>Ton cadeau : un atelier. Boucles d'oreilles ou céramique ? À toi de choisir.</strong></p>
+    </div>
+    <div class="choices">${cards}</div>
+    ${picked ? `<p class="final">Va pour « ${esc(picked.titre)} ». ${esc(MESSAGE_FINAL)}</p>` : ""}`;
+  box.querySelectorAll("[data-pick]").forEach(b=>b.onclick = ()=>{
+    S.choice = b.dataset.pick || null; save(); renderWin();
+    if(S.choice) celebrate(true);
+  });
+}
+
+function celebrate(small){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("canvas"); c.className = "confetti"; document.body.appendChild(c);
+  const ctx = c.getContext("2d"), dpr = window.devicePixelRatio||1;
+  c.width = innerWidth*dpr; c.height = innerHeight*dpr; ctx.scale(dpr,dpr);
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ["--g1","--g2","--g3","--g4","--accent"].map(v=>cs.getPropertyValue(v).trim());
+  const P = Array.from({length: small?60:160}, ()=>({x:innerWidth/2+(Math.random()-.5)*120, y:innerHeight*.35, vx:(Math.random()-.5)*11, vy:-Math.random()*12-4, s:Math.random()*7+4, r:Math.random()*6, vr:(Math.random()-.5)*.3, c:cols[Math.floor(Math.random()*cols.length)]}));
+  let t = 0;
+  (function f(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    P.forEach(p=>{ p.vy+=.35; p.vx*=.99; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); ctx.restore(); });
+    if(++t<150) requestAnimationFrame(f); else c.remove();
+  })();
+}
+
+/* ---------- Reset & boot ---------- */
+$("reset").onclick = ()=>{
+  const r = $("reset");
+  if(r.dataset.armed){
+    S = fresh(); selected.clear(); save(); lastHit = null;
+    $("tab2").disabled = true; $("tab2").textContent = "2 · Pédantle 🔒"; toast(""); $("plast").textContent = "";
+    delete r.dataset.armed; r.textContent = "Tout recommencer"; boot();
+  } else {
+    r.dataset.armed = "1"; r.textContent = "Sûr ? Touche encore pour tout effacer";
+    setTimeout(()=>{ delete r.dataset.armed; r.textContent = "Tout recommencer"; }, 4000);
+  }
+};
+function boot(){
+  renderBoard(); renderPed();
+  if(S.stage>=2){ unlock(); showStage(2); } else showStage(1);
+}
+boot();
+</script>
+
+</body>
+</html>
