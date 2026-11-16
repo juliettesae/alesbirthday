@@ -6,7 +6,7 @@
 <title>Le Grand Indice</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&family=Libre+Franklin:wght@400;600;700&family=Zilla+Slab:wght@300;400;700&display=swap">
 <style>
 /* Layout: one narrow column; stage 1 is a Connections board on clay tones, stage 2 mimics a Wikipedia page with Pédantle redaction. Palette: slip clay + four kiln glazes. */
 :root{
@@ -21,6 +21,10 @@
   --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
   --wserif:"Linux Libertine","Georgia","Times",serif;
   --wsans:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  /* Connections stage: fixed light look */
+  --ny:#f9df6d; --ng:#a0c35a; --nb:#b0c4ef; --np:#ba81c5; --ntile:#efefe6; --nsel:#5a594e; --nlav:#b4a8ff;
+  --franklin:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  --slab:"Zilla Slab","Rockwell",Georgia,serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#1b1917; --surface:#24211f; --tile:#34302c; --tile-on:#e9e3db; --fg:#ece7e0; --muted:#a39a90;
@@ -129,12 +133,125 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:0}
 .card.other{opacity:.5}
 .final{text-align:center;font-family:var(--display);font-weight:700;font-size:20px;margin:0}
 .reset{align-self:center;color:var(--muted);background:none;border:0;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px}
+/* Splash */
+.splash{position:fixed;inset:0;z-index:30;background:var(--nlav);color:#000;display:grid;place-items:center;overflow:auto;
+  padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.splash-in{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:380px}
+.splash-icon{width:64px;height:64px;margin-bottom:14px}
+.splash-title{font-family:var(--slab);font-weight:700;font-size:clamp(36px,10.5vw,46px);line-height:1.05;margin:0 0 8px;letter-spacing:-.01em;color:#000}
+.splash-sub{font-family:var(--slab);font-weight:300;font-size:clamp(24px,7vw,30px);line-height:1.2;margin:0 0 30px;text-wrap:balance;color:#000}
+.splash-play{font-family:var(--franklin);font-weight:600;font-size:16px;background:#000;color:#fff;border:0;border-radius:999px;width:150px;height:48px;cursor:pointer}
+.splash-date{margin:26px 0 0;font-family:var(--franklin);line-height:1.45;display:flex;flex-direction:column;color:#000}
+.splash-date b{font-weight:700;font-size:16px}
+.splash-date span{font-size:14px}
+/* Connections, NYT-style */
+body.nyt{background:#fff;color:#000}
+body.nyt .wrap>header,body.nyt .steps{display:none}
+body.nyt .reset{color:var(--nsel)}
+#s1{max-width:540px;font-family:var(--franklin);color:#000;gap:14px}
+.nyt-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid #dcdcdc;padding-bottom:10px}
+.nyt-title{font-family:var(--slab);font-weight:700;font-size:26px;line-height:1.1}
+.nyt-date{font-size:14px;color:var(--nsel)}
+.nyt-hint{text-align:center;font-size:16px;margin:6px 0 2px}
+#s1 .tile{font-family:var(--franklin);font-weight:700;font-size:clamp(11px,3.3vw,18px);letter-spacing:0;overflow-wrap:normal;word-break:normal;padding:2px;background:var(--ntile);color:#000;border-radius:6px;aspect-ratio:auto;height:clamp(68px,20vw,80px)}
+#s1 .tile[aria-pressed="true"]{background:var(--nsel);color:var(--ntile)}
+#s1 .solved{height:clamp(68px,20vw,80px);display:flex;flex-direction:column;justify-content:center;gap:2px;border-radius:6px;color:#000;padding:6px 10px}
+#s1 .solved b{font-family:var(--franklin);font-weight:700;font-size:clamp(14px,4vw,18px);letter-spacing:0}
+#s1 .solved span{font-family:var(--franklin);font-size:clamp(13px,3.7vw,16px);letter-spacing:0}
+#s1 .mistakes{color:#000;font-size:16px;gap:10px;margin:6px 0}
+#s1 .dot{width:16px;height:16px;background:var(--nsel)}
+#s1 .dot.used{visibility:hidden}
+#s1 .row{gap:10px}
+#s1 .btn{font-family:var(--franklin);font-weight:600;font-size:16px;height:48px;padding:0 18px;border:1px solid #000;background:#fff;color:#000}
+#s1 .btn.primary{background:#000;color:#fff}
+#s1 .btn:disabled{opacity:1;background:#fff;border-color:#7f7f7f;color:#7f7f7f}
+.nyt-toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 96px);left:50%;transform:translateX(-50%);z-index:25;background:#000;color:#fff;font-family:var(--franklin);font-weight:600;font-size:15px;padding:12px 16px;border-radius:6px;pointer-events:none;white-space:nowrap}
+.nyt-toast:empty{display:none}
+/* Pédantle stage: fixed look */
+.wrap>header,.steps{display:none}
+body.pdm{background:#75896f;color:#1d1d1d}
+body.pdm .reset{color:#e8efe6}
+.pd{display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#1d1d1d}
+.pd-top{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;align-items:start;margin-bottom:18px}
+.pd-side{display:flex;flex-direction:column;gap:14px;padding-top:60px;align-items:center}
+.pd-ic{width:36px;height:36px;border-radius:50%;background:#f8d74a;color:#745f78;border:0;font:700 20px Georgia,serif;cursor:pointer;box-shadow:0 2px 3px rgba(0,0,0,.3)}
+.pd-card{background:#f8d74a;border-radius:36px;padding:22px 18px 20px;text-align:center;box-shadow:0 4px 8px rgba(0,0,0,.25);min-width:0}
+.pd-day{font-weight:800;font-size:26px;margin:0 0 10px}
+.pd-found{font-size:19px;margin:0 0 14px}
+.pd-rules{font-size:15px;line-height:1.45;text-align:left;background:rgba(255,255,255,.5);border-radius:12px;padding:10px 12px;margin:0 0 12px}
+.pd-tw{max-height:210px;overflow:auto;margin-bottom:12px}
+.pd-table{width:100%;border-collapse:collapse;font-size:17px;text-align:left;font-variant-numeric:tabular-nums}
+.pd-table th{font-weight:800;font-size:21px;padding:4px 6px}
+.pd-table th.tri{text-align:right;color:#e2392b;font-size:18px}
+.pd-table td{padding:3px 6px}
+.pd-table td.n{width:2.6em;color:#6b5a1a}
+.pd-table td.c{text-align:right;width:3em}
+.pd-table tr.zero td:nth-child(2){color:#8a7a3a}
+.pd-table tr.last td{background:rgba(255,255,255,.55)}
+.pd-yday{background:linear-gradient(#e2bf3a,#f8e27a);border-radius:12px;padding:12px;font-size:18px;line-height:1.35;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+.pd-yday button{font:inherit;font-weight:800;color:#2f6a12;background:none;border:0;text-decoration:underline;cursor:pointer;padding:0}
+.pd-tabs{display:grid;grid-template-columns:1fr 1fr}
+.pd-tab{border-radius:34px 34px 0 0;padding:14px 8px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:0}
+.pd-tab svg{width:100%;max-width:230px;height:auto}
+.pd-tab.on{background:#745f78}
+.pd-tab.off{background:#bba9bd;border:0;font:inherit;cursor:pointer;color:inherit}
+.pd-tab span{font-size:clamp(19px,5.4vw,28px);color:#fff;line-height:1.15}
+.pd-tab.on span{text-shadow:0 2px 3px #000}
+.pd-tab.off span{font-family:Georgia,serif;text-shadow:0 1px 2px #444}
+.pd-main{background:#745f78;border-radius:0 0 34px 34px;padding:18px 14px 22px;display:flex;flex-direction:column;gap:12px}
+.pd-form{display:flex;gap:10px;align-items:center}
+.pd-pin{font-size:24px}
+.pd-form input{flex:1;min-width:0;height:48px;border-radius:8px;border:2px solid #000;background:#1e1e1e;color:#fff;font:inherit;font-size:20px;padding:0 12px}
+.pd-form input::placeholder{color:#a8a8a8}
+.pd-form button{height:48px;padding:0 14px;border-radius:8px;border:2px solid #000;background:#3b8ff6;color:#fff;font:inherit;font-size:20px;cursor:pointer}
+.sq{display:flex;flex-wrap:wrap;gap:5px}
+.sq i{width:26px;height:26px;border-radius:2px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.sq i.g{background:linear-gradient(#5cc93c,#3e9f28)}
+.sq i.o{background:linear-gradient(#f6a748,#e4862b)}
+.sq i.r{background:linear-gradient(#df4a3d,#b72f26)}
+.pd-main .plast{color:#efe6f1;padding:0;min-height:20px;font-size:15px}
+.pd-article{background:#f6f7f6;border-radius:22px;padding:22px 16px 28px;font-size:19px;line-height:2.05;color:#1d1d1d;overflow-wrap:anywhere;box-shadow:inset 0 2px 4px rgba(0,0,0,.1)}
+.pd-article h3{margin:0 0 18px;font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:36px;line-height:1.35}
+.pd-article h4{margin:14px 0 4px;font-size:22px;font-weight:700}
+.pd-article p{margin:0 0 10px}
+.pd-article .r{display:inline-block;height:1.45em;line-height:1.45em;vertical-align:middle;background:#333;border-radius:5px;box-shadow:0 2px 3px rgba(0,0,0,.35);margin:0 3px;position:relative;cursor:pointer;text-align:center;overflow:hidden;white-space:nowrap;font-style:normal}
+.pd-article h3 .r{height:1.5em}
+.pd-article .r.near{font-family:ui-monospace,Menlo,Consolas,monospace;color:#9b9b9b;letter-spacing:.06em;cursor:default;font-size:.95em}
+.pd-article .r.lit{color:#f8d74a;font-family:ui-monospace,Menlo,Consolas,monospace;cursor:default;padding:0 6px}
+.pd-article .r.show::after{content:attr(data-n);position:absolute;inset:0;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff}
+.pd-article .win{background:#8ae66b;padding:0 6px;border-radius:3px;font-weight:700}
+.pd-congrats{background:#2a5a1e;color:#fff;border-radius:22px;padding:20px 18px;display:flex;flex-direction:column;gap:14px;font-size:19px;line-height:1.4;animation:pop .5s ease}
+.pd-congrats p{margin:0}
+.pd-main .final{color:#fff}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 </head>
 <body>
 
+
+<div class="splash" id="splash" hidden>
+  <div class="splash-in">
+    <svg class="splash-icon" viewBox="0 0 64 64" aria-hidden="true">
+      <rect x="2" y="2" width="60" height="60" rx="6" fill="#fff" stroke="#000" stroke-width="3"/>
+      <g stroke="#000" stroke-width="2">
+        <rect x="7" y="7" width="50" height="11" rx="2" fill="#f9df6d"/>
+        <rect x="7" y="20" width="24" height="11" rx="2" fill="#a0c35a"/>
+        <rect x="33" y="20" width="11" height="11" rx="2" fill="#fff"/>
+        <rect x="46" y="20" width="11" height="11" rx="2" fill="#b0c4ef"/>
+        <rect x="7" y="33" width="11" height="11" rx="2" fill="#fff"/>
+        <rect x="20" y="33" width="37" height="11" rx="2" fill="#b0c4ef"/>
+        <rect x="7" y="46" width="37" height="11" rx="2" fill="#ba81c5"/>
+        <rect x="46" y="46" width="11" height="11" rx="2" fill="#fff"/>
+      </g>
+    </svg>
+    <h1 class="splash-title">Happy birthday!</h1>
+    <p class="splash-sub">Play the game to discover your gift</p>
+    <button class="splash-play" id="play">Play</button>
+    <p class="splash-date"><b>November 19, 2026</b><span>By Juliette Saetre</span></p>
+  </div>
+</div>
+<div class="nyt-toast" id="toast1" role="status"></div>
 
 <div class="wrap">
   <header>
@@ -149,35 +266,54 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:0}
   </nav>
 
   <section id="s1">
-    <h2>Connexions</h2>
-    <p class="hint">Trouve quatre groupes de quatre mots. Attention, certains mots ont l'air d'aller ailleurs.</p>
+    <div class="nyt-top"><span class="nyt-title">Happy birthday!</span><span class="nyt-date">November 19, 2026</span></div>
+    <p class="nyt-hint">Create four groups of four!</p>
     <div class="board" id="board"></div>
-    <div class="toast" id="toast1" role="status"></div>
     <div class="mistakes" id="mistakes"></div>
     <div class="row">
-      <button class="btn" id="shuffle">Mélanger</button>
-      <button class="btn" id="deselect">Tout désélectionner</button>
-      <button class="btn primary" id="submit" disabled>Valider</button>
+      <button class="btn" id="shuffle">Shuffle</button>
+      <button class="btn" id="deselect">Deselect All</button>
+      <button class="btn primary" id="submit" disabled>Submit</button>
     </div>
   </section>
 
   <section id="s2" hidden>
-    <div class="ped">
-      <div class="pbar">
-        <span class="plogo">Pédantle<small>édition spéciale</small></span>
-        <span class="pinfo" id="pinfo">Trouve le titre de la page</span>
+    <div class="pd">
+      <div class="pd-top">
+        <div class="pd-side">
+          <button class="pd-ic" id="pdInfo" aria-label="Rules">i</button>
+          <button class="pd-ic" id="pdHelp" aria-label="Help">?</button>
+        </div>
+        <div class="pd-card">
+          <h2 class="pd-day">Day 1</h2>
+          <p class="pd-found" id="pfound">Found by 0 people</p>
+          <p class="pd-rules" id="pdRules" hidden>Find the title of the hidden page. Each word you submit is revealed everywhere it appears. Close words show up in grey inside the boxes. Tap a box to see its number of letters. The page is in French!</p>
+          <div class="pd-tw"><table class="pd-table"><thead><tr><th style="width:2.6em">#</th><th>Word</th><th class="tri">▼</th></tr></thead><tbody id="gtable"></tbody></table></div>
+          <div class="pd-yday">Yesterday's game was:<br><button id="ydayLink">Connections</button></div>
+        </div>
       </div>
-      <form class="pform" id="gform">
-        <input id="ginput" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Un mot…" aria-label="Proposer un mot">
-        <button type="submit">Proposer</button>
-      </form>
-      <div class="plast" id="plast" role="status"></div>
-      <div class="pbody">
-        <div class="article" id="article"></div>
-        <div class="guesses"><table><thead><tr><th>#</th><th>Mot</th><th style="text-align:right">Occ.</th></tr></thead><tbody id="gtable"></tbody></table></div>
+      <div class="pd-tabs">
+        <div class="pd-tab on">
+          <svg viewBox="0 0 210 140" aria-hidden="true"><g fill="#ecd24a"><circle cx="62" cy="68" r="40"/><circle cx="105" cy="46" r="42"/><circle cx="150" cy="62" r="40"/><circle cx="176" cy="96" r="30"/><circle cx="130" cy="104" r="34"/><circle cx="80" cy="104" r="34"/><circle cx="34" cy="96" r="26"/></g><g font-family="Georgia,serif" text-anchor="middle"><text x="105" y="82" font-size="38" fill="#b02a2a">pedantle</text><text x="112" y="104" font-size="15" fill="#2f3a86" font-family="Arial,sans-serif">encyclopédie</text><text x="104" y="124" font-size="14" fill="#2f3a86">géographie</text><text x="92" y="42" font-size="13" fill="#2f3a86">sciences</text><text x="140" y="36" font-size="10" fill="#2f3a86" font-family="Arial,sans-serif">histoire</text><text x="40" y="92" font-size="10" fill="#2f3a86">page</text><text x="172" y="104" font-size="10" fill="#f6eba0" font-family="Arial,sans-serif">arts</text><text x="70" y="58" font-size="9" fill="#f6eba0" font-family="Arial,sans-serif">secret</text></g></svg>
+          <span>Uncover the Wikipedia page!</span>
+        </div>
+        <button class="pd-tab off" id="toCon">
+          <svg viewBox="0 0 210 140" aria-hidden="true"><g fill="#ecd24a"><circle cx="62" cy="68" r="40"/><circle cx="105" cy="46" r="42"/><circle cx="150" cy="62" r="40"/><circle cx="176" cy="96" r="30"/><circle cx="130" cy="104" r="34"/><circle cx="80" cy="104" r="34"/><circle cx="34" cy="96" r="26"/></g><g font-family="Georgia,serif" text-anchor="middle"><text x="105" y="82" font-size="30" fill="#b02a2a">connections</text><text x="108" y="104" font-size="15" fill="#2f3a86" font-family="Arial,sans-serif">groups</text><text x="100" y="124" font-size="14" fill="#2f3a86">four</text><text x="92" y="42" font-size="13" fill="#2f3a86">yellow</text><text x="145" y="36" font-size="10" fill="#2f3a86" font-family="Arial,sans-serif">purple</text><text x="44" y="92" font-size="10" fill="#2f3a86">tiles</text><text x="170" y="104" font-size="10" fill="#f6eba0" font-family="Arial,sans-serif">shuffle</text></g></svg>
+          <span>Find the four groups!</span>
+        </button>
+      </div>
+      <div class="pd-main">
+        <div id="winBox"></div>
+        <form class="pd-form" id="gform">
+          <span class="pd-pin" aria-hidden="true">📍</span>
+          <input id="ginput" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Word" aria-label="Word">
+          <button type="submit">Submit</button>
+        </form>
+        <div class="sq" id="sqRow"></div>
+        <div class="plast" id="plast" role="status"></div>
+        <div class="pd-article" id="article"></div>
       </div>
     </div>
-    <div id="winBox"></div>
   </section>
 
   <button class="reset" id="reset">Tout recommencer</button>
@@ -218,10 +354,10 @@ const MESSAGE_FINAL = "Tu choisis la date, et je réserve !";
 /* ========================================================== */
 
 const GROUPS = [
-  {name:"Petites bêtes", words:["PUCE","MOUCHE","GUÊPE","FOURMI"], color:"--g1"},
-  {name:"Boucles d'oreilles", words:["CRÉOLE","PENDANT","DORMEUSE","CLOU"], color:"--g2"},
-  {name:"Vocabulaire du céramiste", words:["ARGILE","ÉMAIL","ENGOBE","BISCUIT"], color:"--g3"},
-  {name:"Tour de ___", words:["MAIN","COU","FRANCE","MAGIE"], color:"--g4"}
+  {name:"Petites bêtes", words:["PUCE","MOUCHE","GUÊPE","FOURMI"], color:"--ng"},
+  {name:"Boucles d'oreilles", words:["CRÉOLE","PENDANT","DORMEUSE","CLOU"], color:"--ny"},
+  {name:"Vocabulaire du céramiste", words:["ARGILE","ÉMAIL","ENGOBE","BISCUIT"], color:"--nb"},
+  {name:"Tour de ___", words:["MAIN","COU","FRANCE","MAGIE"], color:"--np"}
 ];
 
 const ART = {
@@ -269,6 +405,10 @@ const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 /* ---------- Tabs ---------- */
 function showStage(n){
   $("s1").hidden = n!==1; $("s2").hidden = n!==2;
+  document.body.classList.toggle("nyt", n===1);
+  document.body.classList.toggle("pdm", n===2);
+  $("splash").hidden = !(n===1 && !S.started);
+  window.scrollTo(0,0);
   $("tab1").setAttribute("aria-current", n===1); $("tab2").setAttribute("aria-current", n===2);
 }
 function unlock(){ $("tab2").disabled = false; $("tab2").textContent = "2 · Pédantle"; }
@@ -299,20 +439,21 @@ function renderBoard(){
     });
     b.appendChild(grid);
   }
-  const m = $("mistakes"); m.innerHTML = "Erreurs restantes :";
+  const m = $("mistakes"); m.innerHTML = "Mistakes Remaining:";
   for(let i=0;i<4;i++){ const d=document.createElement("span"); d.className="dot"+(i<S.mistakes?" used":""); m.appendChild(d); }
   $("submit").disabled = selected.size!==4 || S.conLost;
   const done = S.solved.length===4 || S.conLost;
   ["shuffle","deselect","submit"].forEach(id=>$(id).hidden = done);
   m.hidden = done;
   if(done && !$("goPed")){
-    const go = document.createElement("button"); go.id="goPed"; go.className="btn primary"; go.textContent="Passer au Pédantle →";
+    const go = document.createElement("button"); go.id="goPed"; go.className="btn primary"; go.textContent="Next game →";
     go.onclick = ()=>{ showStage(2); $("ginput").focus(); };
     $("shuffle").parentNode.appendChild(go);
   }
   if(!done && $("goPed")) $("goPed").remove();
 }
-function toast(msg){ $("toast1").textContent = msg; }
+let toastT;
+function toast(msg, ms=1800){ $("toast1").textContent = msg; clearTimeout(toastT); if(msg && ms) toastT = setTimeout(()=>{ $("toast1").textContent = ""; }, ms); }
 $("shuffle").onclick = ()=>{ S.order = shuffle(S.order); save(); renderBoard(); };
 $("deselect").onclick = ()=>{ selected.clear(); renderBoard(); };
 $("submit").onclick = ()=>{
@@ -320,18 +461,18 @@ $("submit").onclick = ()=>{
   const gi = GROUPS.findIndex(g=>pick.every(w=>g.words.includes(w)));
   if(gi>=0){
     S.solved.push(gi); selected.clear(); toast("");
-    if(S.solved.length===4){ toast("Bravo ! Le Pédantle est débloqué."); finishCon(); }
+    if(S.solved.length===4){ toast(["Perfect!","Great!","Solid!","Phew!"][S.mistakes] || "Phew!", 2400); finishCon(); }
     save(); renderBoard();
   } else {
     const near = GROUPS.some(g=>pick.filter(w=>g.words.includes(w)).length===3);
     S.mistakes++;
-    toast(near ? "À un mot près…" : "Raté.");
+    if(near) toast("One away...");
     document.querySelectorAll('.tile[aria-pressed="true"]').forEach(t=>{ t.classList.remove("shake"); void t.offsetWidth; t.classList.add("shake"); });
     if(S.mistakes>=4){
       S.conLost = true;
       GROUPS.forEach((g,i)=>{ if(!S.solved.includes(i)) S.solved.push(i); });
       selected.clear();
-      toast("Plus d'essais. Voici les groupes. Le Pédantle est quand même ouvert !");
+      toast("Next time!", 2400);
       finishCon();
     }
     save(); setTimeout(renderBoard, 360);
@@ -351,14 +492,16 @@ function tokenHTML(text){
   text.replace(WORD_RE, (w, idx)=>{
     out += esc(text.slice(i, idx)); i = idx + w.length;
     const st = stem(w);
-    const visible = S.won || FREE.has(norm(w)) || S.guesses.includes(st);
-    const width = `${(w.length*0.55+0.25).toFixed(2)}em`;
+    const visible = FREE.has(norm(w)) || S.guesses.includes(st);
+    const width = `${(w.length*0.62+0.6).toFixed(2)}em`;
     if(visible){
-      out += st===lastHit && !S.won ? `<span class="hit">${esc(w)}</span>` : esc(w);
+      if(S.won && titleStems.includes(st)) out += `<span class="win">${esc(w)}</span>`;
+      else if(st===lastHit) out += `<span class="r lit" style="min-width:${width}">${esc(w)}</span>`;
+      else out += esc(w);
     } else if(S.near[st]){
-      out += `<span class="r near" data-n="${w.length}" style="width:${width}" title="${w.length} lettres">${esc(S.near[st])}</span>`;
+      out += `<span class="r near" data-n="${w.length}" style="width:${width}">${esc(S.near[st])}</span>`;
     } else {
-      out += `<span class="r" data-n="${w.length}" style="width:${width}" title="${w.length} lettres"></span>`;
+      out += `<span class="r" data-n="${w.length}" style="width:${width}"></span>`;
     }
     return w;
   });
@@ -366,7 +509,7 @@ function tokenHTML(text){
 }
 
 function renderPed(){
-  let h = `<h3>${tokenHTML(ART.title)}</h3><p class="from">Un article de Wikipédia, l'encyclopédie libre.</p>`;
+  let h = `<h3>${tokenHTML(ART.title)}</h3>`;
   ART.body.forEach(([k,t])=>{
     if(k==="h") h += `<h4>${tokenHTML(t)}</h4>`;
     else if(k==="s") h += `<p class="see">${tokenHTML(t)}</p>`;
@@ -378,12 +521,11 @@ function renderPed(){
   S.guesses.map((g,i)=>({g,i})).reverse().forEach(({g,i})=>{
     const c = counts[g]||0, tr = document.createElement("tr");
     tr.className = (c?"":"zero") + (i===S.guesses.length-1 && !S.won ? " last":"");
-    tr.innerHTML = `<td class="n">${i+1}</td><td>${esc(g)}</td><td class="c">${c}</td>`;
+    tr.innerHTML = `<td class="n">${i+1}</td><td>${esc((S.typed && S.typed[g]) || g)}</td><td class="c">${c}</td>`;
     tb.appendChild(tr);
   });
-  const n = S.guesses.length;
-  $("pinfo").textContent = S.won ? `Trouvé en ${n} coup${n>1?"s":""}` : `${n} coup${n>1?"s":""}`;
-  $("gform").hidden = S.won;
+  $("sqRow").innerHTML = squares();
+  $("pfound").textContent = S.won ? "Found by 1 person" : "Found by 0 people";
   renderWin();
 }
 
@@ -392,14 +534,15 @@ $("gform").addEventListener("submit", e=>{
   const raw = $("ginput").value.trim(); $("ginput").value = "";
   const w = (raw.match(WORD_RE)||[])[0]; if(!w) return;
   const st = stem(w);
-  if(FREE.has(norm(w))){ $("plast").textContent = `« ${w} » est déjà affiché.`; return; }
-  if(S.guesses.includes(st)){ $("plast").textContent = `Déjà proposé : « ${w} ».`; return; }
+  if(FREE.has(norm(w))){ $("plast").textContent = `“${w}” is already shown.`; return; }
+  if(S.guesses.includes(st)){ $("plast").textContent = `Already tried “${w}”.`; return; }
   S.guesses.push(st);
   lastHit = counts[st] ? st : null;
   let nearN = 0;
   (NEAR[st]||[]).forEach(t=>{ const ts = stem(t); if(counts[ts] && !S.guesses.includes(ts)){ S.near[ts] = w.toLowerCase(); nearN++; } });
-  $("plast").textContent = lastHit ? `« ${w} » : ${counts[st]} occurrence${counts[st]>1?"s":""}.`
-    : nearN ? `« ${w} » n'y est pas, mais c'est proche de quelque chose…` : `« ${w} » n'est pas dans la page.`;
+  S.gnear = S.gnear || {}; if(nearN) S.gnear[st] = true;
+  S.typed = S.typed || {}; S.typed[st] = w.toLowerCase();
+  $("plast").textContent = lastHit ? "" : nearN ? `“${w}” is not in the page, but it's close to something…` : `“${w}” is not in the page.`;
   if(titleStems.every(t=>S.guesses.includes(t))){ S.won = true; lastHit = null; save(); renderPed(); celebrate(); $("winBox").scrollIntoView({behavior:"smooth",block:"start"}); return; }
   save(); renderPed();
 });
@@ -415,7 +558,7 @@ function renderWin(){
     const rows = [["Artisan",c.artisan],["Lieu",c.lieu],["Durée",c.duree],["Quand",c.quand]].filter(r=>r[1]).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("");
     const link = c.lien ? `<a href="${esc(c.lien)}" target="_blank" rel="noopener">Voir l'atelier ↗</a>` : "";
     const btn = S.choice===c.id ? `<button class="btn" data-pick="">Changer d'avis</button>` : `<button class="btn primary" data-pick="${esc(c.id)}">Je choisis celui-ci</button>`;
-    const ph = c.photo ? `<div class="photo has"><img src="${esc(c.photo)}" alt="${esc(c.titre)}"></div>` : `<div class="photo" style="background:var(${c.couleur})">${esc(c.titre)}</div>`;
+    const ph = c.photo ? `<div class="photo has"><img src="${esc(c.photo)}" alt="${esc(c.titre)}"></div>` : "";
     return `<article class="card${cls}">${ph}
       <span class="tag" style="background:var(${c.couleur})">${esc(c.tag)}</span>
       <h3>${esc(c.titre)}</h3>
@@ -425,10 +568,10 @@ function renderWin(){
   }).join("");
   const picked = CHOICES.find(c=>c.id===S.choice);
   box.innerHTML = `
-    <div class="congrats">
-      <p class="big">BRAVO !</p>
-      <p>Tu as trouvé « ${esc(ART.title)} » en ${n} coup${n>1?"s":""}.</p>
-      <p><strong>Ton cadeau : un atelier. Boucles d'oreilles ou céramique ? À toi de choisir.</strong></p>
+    <div class="pd-congrats">
+      <p><b>Congrats!</b> You're the <b>1<sup>st</sup></b> to find it in <b>${n} guess${n>1?"es":""}</b>. Summary of the day:</p>
+      <div class="sq">${squares()}</div>
+      <p>Your gift is a workshop. <b>Choose yours below!</b></p>
     </div>
     <div class="choices">${cards}</div>
     ${picked ? `<p class="final">Va pour « ${esc(picked.titre)} ». ${esc(MESSAGE_FINAL)}</p>` : ""}`;
@@ -437,6 +580,8 @@ function renderWin(){
     if(S.choice) celebrate(true);
   });
 }
+
+function squares(){ return S.guesses.map(g=>`<i class="${counts[g] ? "g" : (S.gnear && S.gnear[g] ? "o" : "r")}"></i>`).join(""); }
 
 function celebrate(small){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -466,6 +611,10 @@ $("reset").onclick = ()=>{
     setTimeout(()=>{ delete r.dataset.armed; r.textContent = "Tout recommencer"; }, 4000);
   }
 };
+$("play").onclick = ()=>{ S.started = true; save(); $("splash").hidden = true; };
+$("toCon").onclick = ()=>showStage(1);
+$("ydayLink").onclick = ()=>showStage(1);
+$("pdInfo").onclick = $("pdHelp").onclick = ()=>{ $("pdRules").hidden = !$("pdRules").hidden; };
 function boot(){
   renderBoard(); renderPed();
   if(S.stage>=2){ unlock(); showStage(2); } else showStage(1);
