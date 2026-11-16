@@ -325,32 +325,35 @@ body.pdm .reset{color:#e8efe6}
 const CHOICES = [
   {
     id: "tour",
-    tag: "Céramique",
+    tag: "Ceramics",
     couleur: "--g3",
     photo: "",
-    titre: "Initiation au tour de potier",
-    description: "Tu apprends à centrer la terre sur le tour et à monter tes premières pièces : un bol, une tasse, ce qui sort de tes mains.",
+    titre: "Pottery wheel class",
+    description: "You learn to centre the clay on the wheel and throw your first pieces: a bowl, a cup, whatever comes out of your hands. It's at À Tour de Bras, the little studio in the 12th we walked past the night we went to see jazz.",
     options: [],
-    quand: "Tu choisis la date",
+    artisan: "À Tour de Bras",
+    lieu: "13 rue Abel, Paris 12e",
+    duree: "2h30",
+    quand: "You pick the date",
     lien: ""
   },
   {
     id: "boucles",
-    tag: "Bijouterie",
+    tag: "Jewellery",
     couleur: "--g2",
     photo: "",
-    titre: "Boucles d'oreilles",
-    description: "Tu fabriques ta propre paire chez un artisan, et tu repars avec. Trois façons de faire :",
+    titre: "Make your own earrings",
+    description: "You make your own pair at a jeweller's bench and leave wearing them. Three ways to do it:",
     options: [
-      ["En laiton", "Tu scies une plaque, tu choisis la forme et la finition : lisse, texturée, brillante ou mate."],
-      ["Gravées et dorées", "Tu découpes le métal, tu le recuis au chalumeau et tu le graves au poinçon, finition à l'or fin."],
-      ["En argent", "Tu modèles une pâte d'argent comme de l'argile, elle passe au four et devient de l'argent massif."]
+      ["Brass", "You saw a sheet of brass and choose the shape and finish: smooth, textured, shiny or matte."],
+      ["Engraved and gold-finished", "You cut the metal, anneal it with a blowtorch and stamp-engrave it, with a fine gold finish."],
+      ["Silver", "You shape a silver paste like clay, it goes in the kiln and comes out as solid silver."]
     ],
-    quand: "Tu choisis la date",
+    quand: "You pick the date",
     lien: ""
   }
 ];
-const MESSAGE_FINAL = "Tu choisis la date, et je réserve !";
+const MESSAGE_FINAL = "Pick a date and I'll book it!";
 /* ========================================================== */
 
 const GROUPS = [
@@ -492,7 +495,7 @@ function tokenHTML(text){
   text.replace(WORD_RE, (w, idx)=>{
     out += esc(text.slice(i, idx)); i = idx + w.length;
     const st = stem(w);
-    const visible = FREE.has(norm(w)) || S.guesses.includes(st);
+    const visible = S.guesses.includes(st);
     const width = `${(w.length*0.62+0.6).toFixed(2)}em`;
     if(visible){
       if(S.won && titleStems.includes(st)) out += `<span class="win">${esc(w)}</span>`;
@@ -534,7 +537,6 @@ $("gform").addEventListener("submit", e=>{
   const raw = $("ginput").value.trim(); $("ginput").value = "";
   const w = (raw.match(WORD_RE)||[])[0]; if(!w) return;
   const st = stem(w);
-  if(FREE.has(norm(w))){ $("plast").textContent = `“${w}” is already shown.`; return; }
   if(S.guesses.includes(st)){ $("plast").textContent = `Already tried “${w}”.`; return; }
   S.guesses.push(st);
   lastHit = counts[st] ? st : null;
@@ -555,9 +557,9 @@ function renderWin(){
   const cards = CHOICES.map((c,i)=>{
     const cls = S.choice ? (S.choice===c.id ? " picked" : " other") : "";
     const opts = (c.options||[]).length ? `<ul>${c.options.map(o=>`<li><b>${esc(o[0])}</b>${esc(o[1])}</li>`).join("")}</ul>` : "";
-    const rows = [["Artisan",c.artisan],["Lieu",c.lieu],["Durée",c.duree],["Quand",c.quand]].filter(r=>r[1]).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("");
-    const link = c.lien ? `<a href="${esc(c.lien)}" target="_blank" rel="noopener">Voir l'atelier ↗</a>` : "";
-    const btn = S.choice===c.id ? `<button class="btn" data-pick="">Changer d'avis</button>` : `<button class="btn primary" data-pick="${esc(c.id)}">Je choisis celui-ci</button>`;
+    const rows = [["Studio",c.artisan],["Where",c.lieu],["Length",c.duree],["When",c.quand]].filter(r=>r[1]).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join("");
+    const link = c.lien ? `<a href="${esc(c.lien)}" target="_blank" rel="noopener">See the studio ↗</a>` : "";
+    const btn = S.choice===c.id ? `<button class="btn" data-pick="">Change my mind</button>` : `<button class="btn primary" data-pick="${esc(c.id)}">I choose this one</button>`;
     const ph = c.photo ? `<div class="photo has"><img src="${esc(c.photo)}" alt="${esc(c.titre)}"></div>` : "";
     return `<article class="card${cls}">${ph}
       <span class="tag" style="background:var(${c.couleur})">${esc(c.tag)}</span>
@@ -574,7 +576,7 @@ function renderWin(){
       <p>Your gift is a workshop. <b>Choose yours below!</b></p>
     </div>
     <div class="choices">${cards}</div>
-    ${picked ? `<p class="final">Va pour « ${esc(picked.titre)} ». ${esc(MESSAGE_FINAL)}</p>` : ""}`;
+    ${picked ? `<p class="final">${esc(picked.titre)} it is! ${esc(MESSAGE_FINAL)}</p>` : ""}`;
   box.querySelectorAll("[data-pick]").forEach(b=>b.onclick = ()=>{
     S.choice = b.dataset.pick || null; save(); renderWin();
     if(S.choice) celebrate(true);
