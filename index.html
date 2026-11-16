@@ -329,7 +329,7 @@ const CHOICES = [
     couleur: "--g3",
     photo: "",
     titre: "Pottery wheel class",
-    description: "You learn to centre the clay on the wheel and throw your first pieces: a bowl, a cup, whatever comes out of your hands. It's at À Tour de Bras, the little studio in the 12th we walked past the night we went to see jazz.",
+    description: "You learn to centre the clay on the wheel and throw your first pieces: a bowl, a cup, whatever comes out of your hands. It's at À Tour de Bras, the little studio in the 12th we walked past the night we went to the pop-up with Vass.",
     options: [],
     artisan: "À Tour de Bras",
     lieu: "13 rue Abel, Paris 12e",
@@ -499,7 +499,6 @@ function tokenHTML(text){
     const width = `${(w.length*0.62+0.6).toFixed(2)}em`;
     if(visible){
       if(S.won && titleStems.includes(st)) out += `<span class="win">${esc(w)}</span>`;
-      else if(st===lastHit) out += `<span class="r lit" style="min-width:${width}">${esc(w)}</span>`;
       else out += esc(w);
     } else if(S.near[st]){
       out += `<span class="r near" data-n="${w.length}" style="width:${width}">${esc(S.near[st])}</span>`;
